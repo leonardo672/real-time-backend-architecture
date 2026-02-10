@@ -1,4 +1,4 @@
-# real-time-backend-architecture
+# Real-time-backend-architecture
 
 Production-grade backend architecture blueprint
 supporting REST APIs and real-time WebSocket communication.
