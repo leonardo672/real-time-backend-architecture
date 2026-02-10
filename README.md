@@ -3,7 +3,11 @@
 Production-grade backend architecture blueprint
 supporting REST APIs and real-time WebSocket communication.
 
-<img src="./docs/architecture.png" alt="Architecture Diagram" style="width:1000; height:1000;">
+<p align="center">
+  <img src="./docs/architecture.png"
+       alt="Architecture Diagram"
+       style="max-width:100%; height:auto;">
+</p>
 
 ## Purpose
 
