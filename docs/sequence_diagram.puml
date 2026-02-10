@@ -1,0 +1,72 @@
+@startuml
+' =========================
+' SEQUENCE DIAGRAM - HTTP + WebSocket Flow
+' =========================
+actor Client as C
+
+participant "Transport Layer\nHTTPS/TLS over TCP" as H
+participant "Web Server" as W
+participant "Middleware + Auth\n(JWT/OAuth2)" as M
+participant "Controller" as Ctrl
+participant "Service" as S
+participant "Model / ORM" as Mod
+participant "Redis Cache" as R
+database "MySQL DB" as DB
+participant "Serializer / Response Formatter" as V
+
+' -------------------------
+' SCENARIO 1: HTTP Request Flow
+' -------------------------
+== HTTP Request Flow ==
+C -> H : Send HTTPS Request
+H -> W : Deliver secure request
+W -> M : Forward request to Middleware
+M -> Ctrl : Authenticated & routed
+Ctrl -> S : Execute business logic
+S -> Mod : Access domain objects
+Mod -> R : Check cache
+R --> Mod : Return cached data if hit
+Mod -> DB : Query DB if cache miss
+DB --> Mod : Return persistent data
+Mod --> S : Return domain data
+S --> Ctrl : Return processed data
+Ctrl -> V : Serialize response
+V --> W : Send HTTP response
+W --> H : Deliver response
+H --> C : Client receives response
+
+' Optional notes
+note right of C
+Scenario 1: Browser/Mobile HTTP request
+Synchronous request-response flow
+end note
+
+' -------------------------
+' SCENARIO 2: WebSocket Flow
+' -------------------------
+== WebSocket Flow ==
+C -> W : WebSocket Upgrade Request
+W -> M : Upgrade connection
+M -> Ctrl : Handle handshake
+note right of Ctrl
+After handshake:
+- Messages may bypass middleware
+- Bi-directional real-time communication
+end note
+
+Ctrl -> S : Optional business logic
+S -> Mod : Optional data access
+Mod -> R : Optional cache check
+R --> Mod : Return cached data if hit
+Mod -> DB : Optional DB access
+DB --> Mod : Return data
+Mod --> S : Return processed data
+S --> Ctrl : Return processed data
+Ctrl --> C : Push message via WebSocket
+
+note right of C
+Scenario 2: Live updates, notifications, chat
+Asynchronous real-time flow
+end note
+
+@enduml
