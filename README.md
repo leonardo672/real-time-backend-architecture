@@ -127,7 +127,7 @@ Example:
   "name": "Alice",
   "email": "alice@example.com"
 }
-
+```
 ---
 
 ### Scenario 2: WebSocket Real-Time Flow
@@ -235,7 +235,7 @@ Example:
   "message": "You have a new message",
   "timestamp": "2026-02-10T14:32:00Z"
 }
-
+```
 ---
 
 ## 🔐 Security Model
