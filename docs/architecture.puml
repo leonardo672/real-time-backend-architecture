@@ -1,0 +1,140 @@
+@startuml
+' =========================
+' DETAILED ARCHITECTURE DIAGRAM - MVC + WebSocket (Refined)
+' =========================
+left to right direction
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam ArrowColor DarkBlue
+skinparam NoteBackgroundColor LightYellow
+skinparam NoteBorderColor DarkGray
+
+' =========================
+' CLIENT LAYER
+' =========================
+package "Client Layer" {
+  component "Client" as C
+}
+note right of C
+Browser / Mobile App
+- Sends HTTP requests
+- Initiates WebSocket handshake
+- Receives responses
+end note
+
+' =========================
+' TRANSPORT LAYER
+' =========================
+package "Transport Layer" {
+  component "HTTPS/TLS over TCP" as H
+}
+note right of H
+HTTPS = HTTP over TLS over TCP
+- Handles encryption & secure transport
+end note
+
+' =========================
+' WEB SERVER
+' =========================
+component "Web Server" as W
+note right of W
+- Accepts connections
+- Terminates TLS
+- Forwards requests to Middleware
+end note
+
+' =========================
+' SECURITY / API GATEWAY
+' =========================
+package "Security Layer" {
+  component "Middleware + Auth (JWT/OAuth2)" as M
+}
+note right of M
+- Authentication & Authorization
+- Rate limiting
+- Request routing
+end note
+
+' =========================
+' APPLICATION LAYER (MVC)
+' =========================
+package "Application Layer" {
+  component "Controller" as Ctrl
+  component "Service" as S
+  component "Model" as Mod
+  component "Serializer / Response Formatter" as V
+}
+note right of Ctrl
+- Handles input validation
+- Routes request to Service
+end note
+note right of S
+- Executes business logic
+- Calls Model / ORM
+end note
+note right of Mod
+- Represents domain objects
+- Accesses cache / database
+end note
+note right of V
+- Formats / serializes response (JSON)
+- Returns to Web Server
+end note
+
+' =========================
+' DATA LAYER
+' =========================
+package "Data Layer" {
+  component "Eloquent ORM" as E
+  database "MySQL" as DB <<DB>>
+  component "Redis Cache" as R <<Cache>>
+}
+note right of R
+- Optional cache for queries/responses
+- Checked before querying DB
+end note
+note right of E
+- Handles data access via ORM
+end note
+note right of DB
+- Stores persistent data
+- Supports migration & schema versioning
+end note
+
+' =========================
+' MAIN FLOW (Synchronous HTTP)
+' =========================
+C --> H : HTTPS Request
+H --> W : Secure connection
+W --> M : Forward request
+M --> Ctrl : Route request if authenticated
+
+Ctrl --> S : Execute business logic
+S --> Mod : Access domain objects
+Mod --> R : Check cache first
+R --> Mod : Return cached data if hit
+Mod --> E : Query DB if cache miss
+E --> DB : Fetch persistent data
+Mod --> S : Return domain data
+S --> Ctrl : Return processed data
+Ctrl --> V : Serialize response
+V --> W : Send response
+W --> C : Deliver response
+
+' =========================
+' WEBSOCKET FLOW (Async)
+' =========================
+C ..> W : WebSocket Upgrade
+W ..> M : Upgrade connection
+M ..> Ctrl : Handle initial handshake
+note right of Ctrl
+- After handshake, messages may bypass middleware
+- Bi-directional real-time communication
+end note
+Ctrl ..> S : Optional business logic
+S ..> Mod : Optional data access
+Mod ..> R : Optional cache usage
+Mod ..> DB : Optional database access
+
+@enduml
