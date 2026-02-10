@@ -36,6 +36,21 @@ This architecture supports **scalable, secure, and real-time applications**.
 
 ---
 
+## 🔄 Request & Real-Time Flow (Sequence)
+
+The following sequence diagram illustrates how the system behaves at runtime
+for both **Scenario 1 (REST API request)** and **Scenario 2 (WebSocket real-time communication)**.
+
+It shows:
+- Secure request flow through middleware and MVC layers
+- Cache-first data access strategy
+- WebSocket upgrade and bi-directional messaging lifecycle
+- Clear separation between synchronous and asynchronous paths
+
+![Sequence Diagram](./docs/sequence_diagram.png)
+
+---
+
 ## 🔁 Scenario 1: Synchronous HTTPS Request Flow
 
 ### 🎯 Example Use Case
